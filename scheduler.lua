@@ -34,6 +34,11 @@ end
 
 return function (mod)
     mod:AddCallback(ModCallbacks.MC_PRE_GAME_EXIT, function ()
+        for _, v in pairs(Scheduler.Entries) do
+            if v.Type == Scheduler.Type.POST_LEAVE_ROOM_EXECUTE or v.Type == Scheduler.Type.PRE_LEAVE_ROOM_EXECUTE then
+                v.Fn()
+            end
+        end
         Scheduler.Entries = {}
     end)
 
@@ -51,7 +56,14 @@ return function (mod)
     mod:AddCallback(ModCallbacks.MC_POST_NEW_ROOM, function ()
         for i, v in pairs(Scheduler.Entries) do
             if v.Type ~= Scheduler.Type.PERSISTENT then
-                if v.Type ~= Scheduler.Type.LEAVE_ROOM_CANCEL and (v.Type == Scheduler.Type.POST_LEAVE_ROOM_EXECUTE or (not REPENTOGON and (v.Type == Scheduler.Type.PRE_LEAVE_ROOM_EXECUTE))) then
+                if v.Type ~= Scheduler.Type.LEAVE_ROOM_CANCEL
+                and (
+                    v.Type == Scheduler.Type.POST_LEAVE_ROOM_EXECUTE
+                    or (
+                        not REPENTOGON
+                        and (v.Type == Scheduler.Type.PRE_LEAVE_ROOM_EXECUTE)
+                    )
+                ) then
                     v.Fn()
                 end
                 table.remove(Scheduler.Entries, i)
